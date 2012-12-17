@@ -264,6 +264,7 @@ namespace clojure.lang.CljCompiler.Ast
         internal static readonly MethodInfo Method_RT_booleanCast = typeof(RT).GetMethod("booleanCast", new Type[] { typeof(object) });
 
         internal static readonly MethodInfo Method_RT_intPtrCast = typeof (RT).GetMethod("intPtrCast", new Type[] { typeof (object) });
+        internal static readonly MethodInfo Method_RT_uintPtrCast = typeof (RT).GetMethod("uintPtrCast", new Type[] { typeof (object) });
 
         #endregion
 
@@ -435,6 +436,10 @@ namespace clojure.lang.CljCompiler.Ast
                 else if(paramType == typeof(IntPtr))
                 {
                     m = HostExpr.Method_RT_intPtrCast;
+                }
+                else if(paramType == typeof(UIntPtr))
+                {
+                    m = HostExpr.Method_RT_uintPtrCast;
                 }
                 else
                 {

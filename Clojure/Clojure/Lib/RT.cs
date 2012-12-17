@@ -2174,6 +2174,17 @@ namespace clojure.lang
         }
         #endregion
 
+        #region UIntPtr casting
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly")]
+        static public UIntPtr uintPtrCast(object x)
+        {
+            if(x is UIntPtr)
+                return (UIntPtr) x;
+            return UIntPtr.Zero;
+        }
+        #endregion
+
         #endregion
 
         #region  More collection support
