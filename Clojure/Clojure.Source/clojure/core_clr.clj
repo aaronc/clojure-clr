@@ -268,9 +268,6 @@
   [^String assembly-name]
   (System.Reflection.Assembly/LoadWithPartialName assembly-name))
 
-
-(def ^:dynamic *ns-load-mappings* (atom []))
-
 (defn add-ns-load-mapping
   "Convenience function to assist with loading .clj files embedded in
   C# projects.  ns-root specifies part of a namespace such as MyNamespace.A and

@@ -3322,7 +3322,7 @@ namespace clojure.lang
             if ( assy != null )
                 yield return Path.GetDirectoryName(assy.Location);
 
-            string rawpaths = (string)System.Environment.GetEnvironmentVariables()[ClojureLoadPathString];
+            string rawpaths = (string)Environment.GetEnvironmentVariables()[ClojureLoadPathString];
             if (rawpaths == null)
                 yield break;
 
@@ -3343,12 +3343,13 @@ namespace clojure.lang
             return FindRemappedFile(fileName);
         }
 
-        public static readonly Var NsLoadMappings = Var.intern(Namespace.findOrCreate(Symbol.intern("clojure.core")),
-                                                 Symbol.intern("*ns-load-mappings*"), null).setDynamic();
+        public static readonly Var NSLoadMappings
+            = Var.intern(Namespace.findOrCreate(Symbol.intern("clojure.core")),
+                                                 Symbol.intern("*ns-load-mappings*"), new Atom(PersistentVector.EMPTY)).setDynamic();
 
         public static FileInfo FindRemappedFile(string filename)
         {
-            var nsLoadMappings = NsLoadMappings.deref() as Atom;
+            var nsLoadMappings = NSLoadMappings.deref() as Atom;
             if (nsLoadMappings == null) return null;
             var nsLoadMappingsVal = nsLoadMappings.deref() as PersistentVector;
             foreach (var x in nsLoadMappingsVal)
@@ -3357,6 +3358,7 @@ namespace clojure.lang
                 if (mapping == null || mapping.length() < 2) continue;
                 var nsRoot = mapping[0] as string;
                 if (nsRoot == null) continue;
+                nsRoot = nsRoot.Replace('.', '/');
                 if(filename.StartsWith(nsRoot))
                 {
                     var fsRoot = mapping[1] as string;
