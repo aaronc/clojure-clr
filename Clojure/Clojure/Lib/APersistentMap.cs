@@ -33,6 +33,12 @@ namespace clojure.lang
         /// <remarks>The value <value>-1</value> indicates that the hash code has not been computed yet.</remarks>
         int _hash = -1;
 
+        /// <summary>
+        /// Caches the hashseq code, when computed.
+        /// </summary>
+        /// <remarks>The value <value>-1</value> indicates that the hasheq code has not been computed yet.</remarks>
+        int _hasheq = -1;
+
         #endregion
 
         #region object overrides
@@ -448,8 +454,18 @@ namespace clojure.lang
 
         public int hasheq()
         {
+            if (_hasheq == -1)
+            {
+                _hasheq = mapHasheq(this);
+            }
+            return _hasheq;
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "map")]
+        public static int mapHasheq(IPersistentMap m)
+        {
             int hash = 0;
-            for (ISeq s = this.seq(); s != null; s = s.next())
+            for (ISeq s = m.seq(); s != null; s = s.next())
             {
                 IMapEntry e = (IMapEntry)s.first();
                 hash += Util.hasheq(e.key()) ^ Util.hasheq(e.val());

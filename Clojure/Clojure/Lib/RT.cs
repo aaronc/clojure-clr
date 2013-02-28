@@ -431,9 +431,10 @@ namespace clojure.lang
         public static readonly Var AgentVar
             = Var.intern(ClojureNamespace, Symbol.intern("*agent*"), null).setDynamic();
 
+        static Object _readeval = ReadTrueFalseUnknown(Environment.GetEnvironmentVariable("CLOJURE_READ_EVAL") ?? Environment.GetEnvironmentVariable("clojure.read.eval") ?? "true");
+            
         public static readonly Var ReadEvalVar
-            //= Var.intern(CLOJURE_NS, Symbol.intern("*read-eval*"), RT.T);
-            = Var.intern(ClojureNamespace, Symbol.intern("*read-eval*"), true).setDynamic();
+            = Var.intern(ClojureNamespace, Symbol.intern("*read-eval*"),_readeval).setDynamic();
 
         public static readonly Var DataReadersVar
             = Var.intern(ClojureNamespace, Symbol.intern("*data-readers*"), RT.map()).setDynamic();
@@ -2488,6 +2489,15 @@ namespace clojure.lang
 
         #region Reader support
 
+        static Object ReadTrueFalseUnknown(String s)
+        {
+            if (s.Equals("true"))
+                return true;
+            else if (s.Equals("false"))
+                return false;
+            return Keyword.intern(null, "unknown");
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly")]
         public static bool isReduced(Object r)
         {
@@ -2768,7 +2778,7 @@ namespace clojure.lang
             foreach (Assembly assy1 in assys)
             {
                 Type t1 = assy1.GetType(p, false);
-                if (t1 != null)
+                if (t1 != null && ! candidateTypes.Contains(t1))
                     candidateTypes.Add(t1);
             }
 
@@ -3322,7 +3332,7 @@ namespace clojure.lang
             if ( assy != null )
                 yield return Path.GetDirectoryName(assy.Location);
 
-            string rawpaths = (string)Environment.GetEnvironmentVariables()[ClojureLoadPathString];
+            string rawpaths = (string)System.Environment.GetEnvironmentVariable(ClojureLoadPathString);
             if (rawpaths == null)
                 yield break;
 

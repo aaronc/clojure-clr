@@ -16,10 +16,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text;
+using System.Text.RegularExpressions;
 //using BigDecimal = java.math.BigDecimal;
 
 namespace clojure.lang
@@ -48,6 +48,8 @@ namespace clojure.lang
 
         static readonly Symbol SLASH = Symbol.intern("/");
         static readonly Symbol CLOJURE_SLASH = Symbol.intern("clojure.core","/");
+
+        static readonly Keyword UNKNOWN = Keyword.intern(null, "unknown");
 
         #endregion
 
@@ -132,6 +134,10 @@ namespace clojure.lang
             object eofValue,
             bool isRecursive)
         {
+
+            if (UNKNOWN.Equals(RT.ReadEvalVar.deref()))
+                throw new InvalidOperationException("Reading disallowed - *read-eval* bound to :unknown");
+
             try
             {
                 for (; ; )
@@ -422,6 +428,11 @@ namespace clojure.lang
             }
         }
 
+        public static object InterpretToken(string token)
+        {
+            return InterpretToken(token, -1);
+        }
+
         public static object InterpretToken(string token, int lastSlashIndex)
         {
             if (token.Equals("nil"))
@@ -518,7 +529,7 @@ namespace clojure.lang
                     if (ns == null)
                         return null;
                     else
-                        return Keyword.intern(Compiler.CurrentNamespace.Name.getName(), nameStr);
+                        return Keyword.intern(ns.Name.getName(), nameStr);
                 }
                 else if (nsStr.StartsWith(":"))
                     return Keyword.intern(nsStr.Substring(1), nameStr);
@@ -1381,15 +1392,9 @@ namespace clojure.lang
                 //    return interpretToken(readToken(r, '%'));
                 if (ARG_ENV.deref() == null)
                 {
-                    string token;
-                    int lastSlashIndex;
-                    if (readToken(r, '%', out token, out lastSlashIndex))
-                        throw new EndOfStreamException("EOF while reading %-token");
-                    else
-                        return InterpretToken(token, lastSlashIndex);
+                    return InterpretToken(readSimpleToken(r, '%'));
                 }
-
-
+                
                 int ch = r.Read();
                 Unread(r, ch);
                 //% alone is first arg
@@ -1434,10 +1439,11 @@ namespace clojure.lang
             {
                 if (!RT.booleanCast(RT.ReadEvalVar.deref()))
                 {
-                    throw new InvalidOperationException("EvalReader not allowed when *read-eval* is false.");
+                    throw new InvalidOperationException("EvalReader not allowed when *read-eval* is false");
                 }
+
                 Object o = read(r, true, null, true);
-                if (o is Symbol)
+                if (o is Symbol  )
                 {
                     return RT.classForName(o.ToString());
                 }
@@ -1449,6 +1455,7 @@ namespace clojure.lang
                         Symbol vs = (Symbol)RT.second(o);
                         return RT.var(vs.Namespace, vs.Name);  //Compiler.resolve((Symbol) RT.second(o),true);
                     }
+
                     if (fs.Name.EndsWith("."))
                     {
                         Object[] args = RT.toArray(RT.next(o));
@@ -1459,9 +1466,11 @@ namespace clojure.lang
                     }
                     if (Compiler.NamesStaticMember(fs))
                     {
+
                         Object[] args = RT.toArray(RT.next(o));
                         return Reflector.InvokeStaticMethod(fs.Namespace, fs.Name, args);
                     }
+                
                     Object v = Compiler.maybeResolveIn(Compiler.CurrentNamespace, fs);
                     if (v is Var)
                     {
@@ -1514,6 +1523,10 @@ namespace clojure.lang
 
             static object ReadRecord(PushbackTextReader r, Symbol recordName)
             {
+                bool readeval = RT.booleanCast(RT.ReadEvalVar.deref());
+                if (!readeval)
+                    throw new InvalidOperationException("Record construction syntax can only be used when *read-eval* == true ");
+
                 Type recordType = RT.classForName(recordName.ToString());
 
                 char endch;

@@ -105,12 +105,14 @@
     <Compile Include="CljCompiler\Ast\Intrinsics.cs" />
     <Compile Include="CljCompiler\Ast\CaseExpr.cs" />
     <Compile Include="Lib\ClrTypeSpec.cs" />
+    <Compile Include="Lib\EdnReader.cs" />
     <Compile Include="Lib\ExceptionInfo.cs" />
     <Compile Include="Lib\IExceptionInfo.cs" />
     <Compile Include="Lib\IFnArity.cs" />
     <Compile Include="Lib\IFnClosure.cs" />
     <Compile Include="Lib\Reduced.cs" />
     <Compile Include="Lib\Task35.cs" />
+    <Compile Include="Readers\PushbackInputStream.cs" />
     <Compile Include="Runtime\Binding\BindingHelpers.cs" />
     <Compile Include="Runtime\Binding\ClojureOverloadResolver.cs" />
     <Compile Include="Runtime\Binding\ClojureCreateInstanceBinder.cs" />
@@ -140,7 +142,6 @@
     <Compile Include="Lib\ArityException.cs" />
     <Compile Include="Lib\AtomicBoolean.cs" />
     <Compile Include="Lib\BigDecimal.cs" />
-    <Compile Include="CljCompiler\Ast\AFnImplGenerator.cs" />
     <Compile Include="CljCompiler\Ast\AssignableExpr.cs" />
     <Compile Include="CljCompiler\Ast\AssignExpr.cs" />
     <Compile Include="CljCompiler\Ast\BindingInit.cs" />
