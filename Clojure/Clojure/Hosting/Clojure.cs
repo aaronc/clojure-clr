@@ -20,7 +20,7 @@ namespace clojure.lang.Hosting
         public static void Require(string nsname)
         {
             if (!nsname.Equals("clojure.core"))
-                REQUIRE.invoke(nsname);
+                REQUIRE.invoke(Symbol.intern(nsname));
         }
 
         /// <summary>
