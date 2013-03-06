@@ -1,3 +1,4 @@
+using System;
 using System.Dynamic;
 
 namespace clojure.lang.Hosting
@@ -9,6 +10,7 @@ namespace clojure.lang.Hosting
     /// </summary>
     public class Clojure
     {
+        private const string CLOJURE_LOAD_PATH = "CLOJURE_LOAD_PATH";
         private static readonly Var REQUIRE = RT.var("clojure.core", "require");
 
         /// <summary>
@@ -63,6 +65,17 @@ namespace clojure.lang.Hosting
         public static void AddNamespaceLoadMapping(string namespaceBase, string directory)
         {
             RT.var("clojure.core", "add-ns-load-mapping").invoke(namespaceBase, directory);
+        }
+
+        /// <summary>
+        /// Adds a path to the CLOJURE_LOAD_PATH environment variable used to load Clojure files from the disk.
+        /// </summary>
+        /// <param name="path">The path to add to CLOJURE_LOAD_PATH.  Use ; to separate multiple paths.</param>
+        public static void AddToLoadPath(string path)
+        {
+            var cljLoadPath = Environment.GetEnvironmentVariable(CLOJURE_LOAD_PATH);
+            cljLoadPath += ";" + path;
+            Environment.SetEnvironmentVariable(CLOJURE_LOAD_PATH, cljLoadPath);
         }
     }
 }

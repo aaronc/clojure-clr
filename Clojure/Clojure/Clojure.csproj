@@ -108,6 +108,7 @@
     <Compile Include="CljCompiler\Ast\IlGen.cs" />
     <Compile Include="CljCompiler\Ast\Intrinsics.cs" />
     <Compile Include="CljCompiler\Ast\CaseExpr.cs" />
+    <Compile Include="Hosting\Clojure.cs" />
     <Compile Include="Lib\ClrTypeSpec.cs" />
     <Compile Include="Lib\EdnReader.cs" />
     <Compile Include="Lib\ExceptionInfo.cs" />
