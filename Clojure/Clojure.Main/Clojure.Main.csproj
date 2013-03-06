@@ -80,7 +80,6 @@
     <Reference Include="Microsoft.Scripting.Core" Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">
       <HintPath>..\..\lib\DLR\2.0\Microsoft.Scripting.Core.dll</HintPath>
     </Reference>
-      <HintPath>..\packages\pNUnit.2.6.0.12054\lib\pnunit.framework.dll</HintPath>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
