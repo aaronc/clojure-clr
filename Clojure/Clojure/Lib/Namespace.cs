@@ -323,7 +323,14 @@ namespace clojure.lang
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "import")]
         public Type importClass(Symbol sym, Type t)
         {
-            return ReferenceClass(sym, t);
+            try
+            {
+                return ReferenceClass(sym, t);
+            }
+            catch (Exception ex)
+            {
+                throw new TypeImportException(string.Format("Error importing type {0} as symbol {1}", t, sym));
+            }
         }
 
 
@@ -336,8 +343,15 @@ namespace clojure.lang
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "import")]
         public Type importClass(Type t)
         {
-            string n = Util.NameForType(t);   
-            return importClass(Symbol.intern(n), t);
+            try
+            {
+                string n = Util.NameForType(t);   
+                return importClass(Symbol.intern(n), t);
+            }
+            catch (Exception ex)
+            {
+                throw new TypeImportException(string.Format("Error importing type {0}", t));
+            }
         }
 
         /// <summary>
@@ -502,5 +516,33 @@ namespace clojure.lang
         }
 
         #endregion
+
+
+        [Serializable]
+        public class TypeImportException : Exception
+        {
+            #region C-tors
+
+            public TypeImportException()
+            {
+            }
+
+            public TypeImportException(string msg)
+                : base(msg)
+            {
+            }
+
+            public TypeImportException(string msg, Exception innerException)
+                : base(msg, innerException)
+            {
+            }
+
+            protected TypeImportException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+            }
+
+            #endregion
+        }
     }
 }
