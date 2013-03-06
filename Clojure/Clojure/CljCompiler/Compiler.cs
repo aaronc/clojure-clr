@@ -1410,64 +1410,6 @@ namespace clojure.lang
         
         #region Loading
 
-        internal static bool LoadAssembly(FileInfo assyInfo, string relativePath)
-        {
-            Assembly assy = Assembly.LoadFrom(assyInfo.FullName);
-            return InitAssembly(assy, relativePath);
-        }
-
-        internal static bool LoadAssembly(byte[] assyData, string relativePath)
-        {
-            Assembly assy = Assembly.Load(assyData);
-            return InitAssembly(assy, relativePath);
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        private static bool InitAssembly(Assembly assy, string relativePath)
-        {
-            Type initType = assy.GetType(InitClassName(relativePath));
-            if (initType == null)
-            {
-                initType = assy.GetType("__Init__"); // old init class name
-                if (initType == null)
-                {
-                    Console.WriteLine("Bad assembly");
-                    return false;
-                }
-            }
-            return InvokeInitType(assy, initType);
-        }
-
-        private static bool InvokeInitType(Assembly assy, Type initType)
-        {
-            try
-            {
-                initType.InvokeMember("Initialize", BindingFlags.InvokeMethod | BindingFlags.Static | BindingFlags.Public, Type.DefaultBinder, null, new object[0]);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error initializing {0}: {1}", assy.FullName, e);
-                return false;
-            }
-        }
-
-        internal static bool TryLoadInitType(string relativePath)
-        {
-            var initClassName = InitClassName(relativePath);
-            Type initType = null;
-            foreach(var asm in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (asm.IsDynamic) continue;
-                initType = asm.GetType(initClassName);
-                if (initType != null)
-                    break;
-            }
-            if (initType == null)
-                return false;
-            return InvokeInitType(initType.Assembly, initType);
-        }
-
         internal static void LoadAssembly(FileInfo assyInfo, string relativePath)
         {
             Assembly assy;
