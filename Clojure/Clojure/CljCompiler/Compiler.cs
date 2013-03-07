@@ -1353,7 +1353,7 @@ namespace clojure.lang
 
                 var descAttrBuilder =
                  new CustomAttributeBuilder(typeof (DescriptionAttribute).GetConstructor(new[] {typeof (String)}),
-                                           new [] {String.Format("{{:clojure-namespace '{0}}}", CurrentNamespace)});
+                                           new [] {String.Format("{{:clojure-namespace {0}}}", CurrentNamespace)});
                 initTB.SetCustomAttribute(descAttrBuilder);
                 initTB.CreateType();
             }
