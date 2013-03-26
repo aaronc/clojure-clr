@@ -1273,11 +1273,17 @@ namespace clojure.lang
                 throw new InvalidOperationException("*compile-path* not set");
 
             string sourcePath = relativePath;
-            GenContext context = GenContext.CreateWithExternalAssembly(sourceName, sourcePath, ".dll", true);
+
+            var context = CompilerContextVar.deref() as GenContext;
+            if(!IsCompiling || context == null)
+            {
+                context = GenContext.CreateWithExternalAssembly(sourceName, sourcePath, ".dll", true);
+            }
 
             Compile(context, rdr, sourceDirectory, sourceName, relativePath);
 
-            context.SaveAssembly();
+            if(!IsCompiling || CompilerContextVar.deref() == null)
+                context.SaveAssembly();
 
             return null;
         }
@@ -1507,15 +1513,8 @@ namespace clojure.lang
             }
             if (initType == null)
                 return false;
-            try
-            {
-                InvokeInitType(initType.Assembly, initType);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            InvokeInitType(initType.Assembly, initType);
+            return true;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "load")]
