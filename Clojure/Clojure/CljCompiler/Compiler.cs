@@ -1274,15 +1274,12 @@ namespace clojure.lang
 
             string sourcePath = relativePath;
 
-            var context = CompilerContextVar.deref() as GenContext;
-            if(!IsCompiling || context == null)
-            {
-                context = GenContext.CreateWithExternalAssembly(sourceName, sourcePath, ".dll", true);
-            }
+            var existingContext = CompilerContextVar.deref() as GenContext;
+            var context = existingContext ?? GenContext.CreateWithExternalAssembly(sourceName, sourcePath, ".dll", true);
 
             Compile(context, rdr, sourceDirectory, sourceName, relativePath);
 
-            if(!IsCompiling || CompilerContextVar.deref() == null)
+            if(existingContext == null)
                 context.SaveAssembly();
 
             return null;
